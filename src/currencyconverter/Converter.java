@@ -1,0 +1,854 @@
+package currencyconverter;
+
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+
+/**
+ *
+ * @author Sporax
+ */
+
+// Packaging updated and working as of 12/28/16. Only thing left for v2.0 is ...
+// This app is working as of 11/19/2016, with updated structures and classes
+// App still working as of 11/26/2016, with text file support (rates.txt)
+// Working with add/remove currency features as of 12/12/16; attempting a convert
+//  with one of the new currencies should break the app.
+// Fetches currency from field if rate provided, then from internet if connection
+//  available, otherwise from stored value. 12/13/2016
+
+/* TODOs:
+    * fix add currency size
+    
+    v remove output area horizontal scroll
+    v enter doesn't work in add currency
+    v Add outputCurrency drop box
+    v Update UI, revamp and add required fields -- do this in a new java file (Converter2.java)
+       and make backups
+    v prevent removal of usd or inr
+    v remove "-" from output
+    v if rate field is empty replace with 0
+    v clear all after removing currency
+    v fix .000 currency -- amounts less than 1 should be 0.xxx, not .xxx
+    v '-' amount, which converts given quantity without "thousand", "million", etc.
+        outputs quantity without scale number
+    v If currency doesn't convert to other currency and no internet available,
+      either prompt for conversion rate or don't convert
+    v Update the drop box of currency options using stored currencies (currencies.keySet())
+    v add file menu
+    v file menu should include: 'add', 'remove', and 'clear' features
+    v Complete the 'add' currency
+    v Complete the 'remove' currency feature
+    v Complete the 'clear' currency feature
+    v Finish initializing values using Units.java and Currency.java
+    v Finish read/write to rates.txt using Currency.java
+    v Update local rates after fetching values
+    v Also update the drop box of currency type using the provided currency 
+        (formats.get(currencies.get(selectedCurrency).getFormat())
+    v update the way format works so that Currency.getFormat gives a Units object instead of
+        a string that can be passed into the formats field to get a units object
+
+    v Discuss further ideas for improvement with the client. This project is near completion
+    [skipped] include time stamps in rates.txt (client doesn't need time stamps)
+    */
+
+public class Converter extends javax.swing.JFrame {
+    // currencies is a map of string currency type to currency object. Each currency object
+    // has fields for (string name, hashmap rates (string to double), and String type (inf/usf)).
+    // Most used methods: 
+    //      currencies.get("XXX").getRate("YYY")
+    //                           .setRate("YYY", 123)        > 
+    //                           .convertsTo(other currency) > true/false
+    //                           .getFormat()                > Units.ISF/Units.USF
+    //                           .getFormatAsString()        > "isf"/"usf"
+    private LinkedHashMap<String, Currency> currencies;
+    
+    /**
+     * Creates new form Converter
+     */
+    public Converter() {
+        Currency.createDatabase();
+        initComponents();
+        // initialize formats
+        currencies = Currency.initializeAllCurrencies();
+        // set input currencies drop box using key set of currencies field
+        String[] list = currencies.keySet().toArray(new String[currencies.keySet().size()]);
+        inputCurrencyField.setModel(new DefaultComboBoxModel(list));
+        // set output currencies drop box, not including selected index
+        Set<String> copy = new LinkedHashSet<>(currencies.keySet());
+        copy.remove(list[0]);
+        list = copy.toArray(new String[copy.size()]);
+        outputCurrencyField.setModel(new DefaultComboBoxModel(list));
+        // set amount drop box using selected currency's units object's units field
+        List<String> quantities = currencies.get(inputCurrencyField.getSelectedItem().toString())
+                                    .getFormat().getQuantities();
+        list = quantities.toArray(new String[quantities.size()]);
+        amountField.setModel(new DefaultComboBoxModel(list));
+        // remove horizontal scroll from output area
+        outputArea.setLineWrap(true);
+    }
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        addCurrency = new javax.swing.JDialog();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        addCurrencyInstructions = new javax.swing.JTextArea();
+        newCurrencyName = new javax.swing.JTextField();
+        cancelAddButton = new javax.swing.JButton();
+        addCurrencyButton = new javax.swing.JButton();
+        addCurrencyError = new javax.swing.JLabel();
+        removeCurrency = new javax.swing.JDialog();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        removeCurrencySelection = new javax.swing.JComboBox();
+        cancelRemoveButton = new javax.swing.JButton();
+        removeCurrencyButton = new javax.swing.JButton();
+        confirmRemove = new javax.swing.JCheckBox();
+        removeWarningLabel = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        convertButton = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        rateField = new javax.swing.JTextField();
+        bClear = new javax.swing.JButton();
+        inputField = new javax.swing.JTextField();
+        amountField = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        inputCurrencyField = new javax.swing.JComboBox();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        outputArea = new javax.swing.JTextArea();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        outputCurrencyField = new javax.swing.JComboBox<>();
+        jLabel13 = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        menuClearAll = new javax.swing.JMenu();
+        menuClear = new javax.swing.JMenuItem();
+        menuAdd = new javax.swing.JMenuItem();
+        menuRemove = new javax.swing.JMenuItem();
+
+        addCurrency.setBackground(new java.awt.Color(255, 255, 255));
+        addCurrency.setMinimumSize(new java.awt.Dimension(337, 253));
+        addCurrency.setPreferredSize(new java.awt.Dimension(337, 253));
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel8.setFont(new java.awt.Font("Ubuntu", 1, 16)); // NOI18N
+        jLabel8.setText("Add Currency");
+
+        jLabel9.setText("Currency Code:");
+
+        addCurrencyInstructions.setColumns(20);
+        addCurrencyInstructions.setRows(5);
+        addCurrencyInstructions.setText("To add a new currency, enter a \ncurrency code,\n     eg. USD for US Dollars\n");
+        jScrollPane2.setViewportView(addCurrencyInstructions);
+
+        newCurrencyName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                newCurrencyNameKeyPressed(evt);
+            }
+        });
+
+        cancelAddButton.setText("Cancel");
+        cancelAddButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelAddButtonActionPerformed(evt);
+            }
+        });
+
+        addCurrencyButton.setText("Add Currency");
+        addCurrencyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addCurrencyButtonActionPerformed(evt);
+            }
+        });
+
+        addCurrencyError.setForeground(new java.awt.Color(255, 0, 0));
+        addCurrencyError.setText("Error: currency code invalid");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(118, 118, 118)
+                        .addComponent(jLabel8))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(65, 65, 65)
+                        .addComponent(jLabel9)
+                        .addGap(28, 28, 28)
+                        .addComponent(newCurrencyName, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(37, 37, 37)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(41, 41, 41)
+                                .addComponent(addCurrencyError)))))
+                .addContainerGap(38, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(cancelAddButton)
+                .addGap(54, 54, 54)
+                .addComponent(addCurrencyButton)
+                .addGap(62, 62, 62))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel8)
+                .addGap(19, 19, 19)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(newCurrencyName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(addCurrencyError)
+                .addGap(2, 2, 2)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cancelAddButton)
+                    .addComponent(addCurrencyButton))
+                .addContainerGap(22, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout addCurrencyLayout = new javax.swing.GroupLayout(addCurrency.getContentPane());
+        addCurrency.getContentPane().setLayout(addCurrencyLayout);
+        addCurrencyLayout.setHorizontalGroup(
+            addCurrencyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        addCurrencyLayout.setVerticalGroup(
+            addCurrencyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        removeCurrency.setBackground(new java.awt.Color(255, 255, 255));
+        removeCurrency.setMinimumSize(new java.awt.Dimension(340, 159));
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel11.setFont(new java.awt.Font("Ubuntu", 1, 16)); // NOI18N
+        jLabel11.setText("Remove Currency");
+
+        jLabel12.setText("Select Currency:");
+
+        removeCurrencySelection.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "USF", "ISF" }));
+        removeCurrencySelection.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                removeCurrencySelectionKeyPressed(evt);
+            }
+        });
+
+        cancelRemoveButton.setText("Cancel");
+        cancelRemoveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelRemoveButtonActionPerformed(evt);
+            }
+        });
+
+        removeCurrencyButton.setText("Remove Currency");
+        removeCurrencyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeCurrencyButtonActionPerformed(evt);
+            }
+        });
+
+        confirmRemove.setText("Are you sure?");
+        confirmRemove.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                confirmRemoveKeyPressed(evt);
+            }
+        });
+
+        removeWarningLabel.setForeground(new java.awt.Color(255, 0, 0));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(48, 48, 48)
+                        .addComponent(cancelRemoveButton)
+                        .addGap(39, 39, 39)
+                        .addComponent(removeCurrencyButton))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(65, 65, 65)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addComponent(jLabel12)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(removeCurrencySelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(confirmRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(42, 42, 42)
+                                .addComponent(removeWarningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(94, 94, 94)
+                        .addComponent(jLabel11)))
+                .addContainerGap(36, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jLabel11)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(removeCurrencySelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(removeWarningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(confirmRemove)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cancelRemoveButton)
+                    .addComponent(removeCurrencyButton))
+                .addContainerGap(23, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout removeCurrencyLayout = new javax.swing.GroupLayout(removeCurrency.getContentPane());
+        removeCurrency.getContentPane().setLayout(removeCurrencyLayout);
+        removeCurrencyLayout.setHorizontalGroup(
+            removeCurrencyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        removeCurrencyLayout.setVerticalGroup(
+            removeCurrencyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(removeCurrencyLayout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(1, 1, 1));
+        setForeground(java.awt.Color.black);
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+
+        convertButton.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        convertButton.setText("Convert");
+        convertButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                convertButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("(or fetch from Yahoo finance)");
+
+        rateField.setText("0");
+
+        bClear.setText("clear");
+        bClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bClearActionPerformed(evt);
+            }
+        });
+
+        inputField.setText("0");
+        inputField.setToolTipText("");
+
+        amountField.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "thousand", "million", "billion" }));
+
+        jLabel2.setText("Amount");
+
+        jLabel3.setText("From");
+
+        inputCurrencyField.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "USD", "INR" }));
+        inputCurrencyField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inputCurrencyFieldActionPerformed(evt);
+            }
+        });
+
+        outputArea.setEditable(false);
+        outputArea.setColumns(20);
+        outputArea.setFont(new java.awt.Font("Ubuntu", 0, 22)); // NOI18N
+        outputArea.setRows(5);
+        outputArea.setAutoscrolls(false);
+        jScrollPane1.setViewportView(outputArea);
+
+        jLabel4.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jLabel4.setText("Convert Any Amount");
+
+        jLabel10.setText("to");
+
+        outputCurrencyField.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "INR" }));
+
+        jLabel13.setText("Enter a Rate");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(26, 26, 26)
+                                .addComponent(inputField, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(22, 22, 22))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(18, 18, 18)
+                                .addComponent(inputCurrencyField, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel10)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(amountField, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(outputCurrencyField, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(81, 81, 81)
+                        .addComponent(jLabel4))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(convertButton, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addComponent(jLabel13)
+                                    .addGap(61, 61, 61)
+                                    .addComponent(rateField, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(bClear))
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel4)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel10)
+                        .addComponent(outputCurrencyField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(inputField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(amountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(inputCurrencyField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bClear)
+                    .addComponent(jLabel13))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(convertButton, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(8, 8, 8))
+        );
+
+        menuClearAll.setText("File");
+
+        menuClear.setText("Clear All");
+        menuClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuClearActionPerformed(evt);
+            }
+        });
+        menuClearAll.add(menuClear);
+
+        menuAdd.setText("Add Currency");
+        menuAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuAddActionPerformed(evt);
+            }
+        });
+        menuClearAll.add(menuAdd);
+
+        menuRemove.setText("Remove Currency");
+        menuRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuRemoveActionPerformed(evt);
+            }
+        });
+        menuClearAll.add(menuRemove);
+
+        jMenuBar1.add(menuClearAll);
+
+        setJMenuBar(jMenuBar1);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void convertButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_convertButtonActionPerformed
+        // get numerical quantity entered, input currency and target currency
+        String inputAmount = inputField.getText().replaceAll("[^0-9.-]", "");
+        String inputCurrency = inputCurrencyField.getSelectedItem().toString();
+        String targetCurrency = outputCurrencyField.getSelectedItem().toString();
+        
+        // check that the input is a valid quantity
+        double amount = 0;
+        try {
+            // amount stores the decimal value
+            amount = Double.parseDouble(inputAmount);
+        } catch (NumberFormatException nfe) {
+            // display an error message because no rate is stored and no internet connection
+            outputArea.setText("Unable to convert\nPlease check input");
+            return;
+        }
+
+        // convert words to digits, eg: "5 million" -> 5000000
+        String quantity = amountField.getSelectedItem().toString();
+        amount *= currencies.get(inputCurrency).getFormat().toDigits(quantity);
+        
+        // fetch conversion rate and convert
+        /* CASES:
+            1. text field contains conversion rate: use provided rate
+            2. internet is available: fetch rate from internet, update local rate
+            3. internet is not available: use prevRate, provide dateStamp
+        */
+        double convRate = 67;
+        if (rateField.getText().trim().equals(""))
+            rateField.setText("0");
+        if (!rateField.getText().equals("0")) {
+            convRate = Double.parseDouble(rateField.getText());
+        } else {
+            // check if an internet connection is present and working
+            boolean internetAvailable = false;
+            try {
+                Process p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 finance.yahoo.com");
+                int returnVal = p1.waitFor();
+                internetAvailable = (returnVal==0);
+            } catch (IOException | InterruptedException ex) {
+                Logger.getLogger(Converter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            System.out.println("internet: " + internetAvailable);
+            if (internetAvailable) {
+                // fetch the conversion rate from yahoo finance
+                convRate = getExchangeRate(inputCurrency, targetCurrency);
+            }
+            // if fetching failed
+            if (!internetAvailable || convRate == -1) {
+                if (currencies.get(inputCurrency).convertsTo(targetCurrency)) {
+                    // use stored rate
+                    convRate = currencies.get(inputCurrency).getRate(targetCurrency);
+                } else {
+                    // display an error message because no rate is stored and no internet connection
+                    outputArea.setText("Unable to fetch a conversion rate."
+                                        + "\nIf you don't have an internet connection,"
+                                        + "\ninput a conversion rate.");
+                    return;
+                }
+            }
+        }
+        amount *= convRate;
+        // convert amount back to decimal value and store units
+        String result = currencies.get(targetCurrency).getFormat().toWords(amount);
+        // output the result
+        outputArea.setText(result + " " + targetCurrency +"\nConversion rate: " + convRate);
+        // set the rateField to the conversion rate so fetching is faster after the first time
+        rateField.setText(convRate + "");
+    }//GEN-LAST:event_convertButtonActionPerformed
+    
+    private double getExchangeRate(String from, String to) {
+        double rate = 67;  // some arbitrary amount, should be fetched in advance
+        if (currencies.get(from).convertsTo(to)) {
+            rate = currencies.get(from).getRate(to);
+        }
+        try {
+            URL convert = new URL("http://download.finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s="
+                    + from + to + "=X");
+            BufferedReader in = new BufferedReader(new InputStreamReader(convert.openStream()));
+            String answer = in.readLine();
+            in.close();
+            rate = Double.parseDouble(answer.substring(11,16));
+        } catch (MalformedURLException mue) {
+            System.err.println(mue);
+        } catch (IOException ioe) {
+            System.err.println(ioe);
+        } catch (StringIndexOutOfBoundsException oe) {
+            System.err.println(oe);
+            return -1;
+        }
+        // update rate file with new rate
+        currencies.get(from).setRate(to, rate);
+        return rate;
+    }
+    
+    private void bClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bClearActionPerformed
+        rateField.setText("0");
+    }//GEN-LAST:event_bClearActionPerformed
+
+    private void inputCurrencyFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputCurrencyFieldActionPerformed
+        // get selected currency
+        String currency = inputCurrencyField.getSelectedItem().toString();
+        // get all possible quantities for this currency (eg. thousand, million, billion)
+        List<String> quantities = currencies.get(currency).getFormat().getQuantities();
+        // store quantities as an array
+        String[] temp = quantities.toArray(new String[quantities.size()]);
+        // set amountField to quantities
+        amountField.setModel(new javax.swing.DefaultComboBoxModel(temp));
+        // update output currencies, not including selected index
+        Set<String> copy = new LinkedHashSet<>(currencies.keySet());
+        copy.remove(currency);
+        String[] list = copy.toArray(new String[copy.size()]);
+        outputCurrencyField.setModel(new DefaultComboBoxModel(list));
+
+        // reset the rateField every time a new currency is selected
+        rateField.setText("0");
+    }//GEN-LAST:event_inputCurrencyFieldActionPerformed
+
+    private void menuAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddActionPerformed
+        // show add currency dialog
+        addCurrencyError.setVisible(false);
+        addCurrency.setVisible(true);
+    }//GEN-LAST:event_menuAddActionPerformed
+
+    private void menuClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuClearActionPerformed
+        clearAll();
+    }//GEN-LAST:event_menuClearActionPerformed
+
+    private void cancelAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelAddButtonActionPerformed
+        newCurrencyName.setText("");
+        addCurrency.dispose();
+    }//GEN-LAST:event_cancelAddButtonActionPerformed
+
+    private void addCurrencyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addCurrencyButtonActionPerformed
+        addCurrency();
+    }//GEN-LAST:event_addCurrencyButtonActionPerformed
+
+    private void cancelRemoveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelRemoveButtonActionPerformed
+        removeCurrency.dispose();
+    }//GEN-LAST:event_cancelRemoveButtonActionPerformed
+
+    private void removeCurrencyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeCurrencyButtonActionPerformed
+        removeCurrency();
+    }//GEN-LAST:event_removeCurrencyButtonActionPerformed
+
+    private void menuRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRemoveActionPerformed
+        String[] list = currencies.keySet().toArray(new String[currencies.keySet().size()]);
+        // set remove selection default
+        removeCurrencySelection.setModel(new DefaultComboBoxModel(list));
+        removeCurrency.setVisible(true);
+    }//GEN-LAST:event_menuRemoveActionPerformed
+
+    private void newCurrencyNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_newCurrencyNameKeyPressed
+        int keyCode = evt.getKeyCode();
+        if (keyCode == KeyEvent.VK_ENTER) {
+            // add currency
+            addCurrency();
+        }
+    }//GEN-LAST:event_newCurrencyNameKeyPressed
+
+    private void removeCurrencySelectionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_removeCurrencySelectionKeyPressed
+        int keyCode = evt.getKeyCode();
+        if (keyCode == KeyEvent.VK_ENTER) {
+            // remove currency
+            removeCurrency();
+        }
+    }//GEN-LAST:event_removeCurrencySelectionKeyPressed
+
+    private void confirmRemoveKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_confirmRemoveKeyPressed
+        int keyCode = evt.getKeyCode();
+        if (keyCode == KeyEvent.VK_ENTER) {
+            // remove currency
+            removeCurrency();
+        }
+    }//GEN-LAST:event_confirmRemoveKeyPressed
+
+    private void addCurrency() {
+        // get input from text field
+        String currency = newCurrencyName.getText().toUpperCase();
+        // get type: if it's one of the provided types, it's isf, otherwise usf.
+        String type = Arrays.asList(new String[]{"LKR", "PKR", "NPR", "BDT", "INR"})
+                        .contains(currency) ? "isf" : "usf";
+        // get valid codes
+        try {
+            Scanner validCodes = new Scanner(getClass().getResourceAsStream("/currencycodes.txt"))
+                                    .useDelimiter(",");
+            ArrayList<String> checkCodes = new ArrayList<>();
+            while (validCodes.hasNext())
+                checkCodes.add(validCodes.next());
+            // if input is the wrong format, add error message to text box
+            if (currency.length() != 3 || !checkCodes.contains(currency)) {
+                // show error message
+                addCurrencyError.setVisible(true);
+            } else if (currencies.keySet().contains(currency)) {
+                // if the currency already exists, print an error message and don't add it
+            } else {
+                // create new currency
+                Currency newCurrency = new Currency(currency, type);
+                newCurrency.addToDatabase();
+                // update input currency field
+                inputCurrencyField.addItem(currency);
+                // add new currency to currencies
+                currencies.put(currency, newCurrency);
+                // clear text field for next use
+                newCurrencyName.setText("");
+                // close dialog
+                clearAll();
+                addCurrency.dispose();
+            }
+        } catch (NullPointerException | NoSuchElementException e) {
+            System.err.println(e);
+        }
+    }
+    
+    private void removeCurrency() {
+        // remove currency from currencies.txt
+        if (confirmRemove.isSelected()) {
+            confirmRemove.setSelected(false);
+            String name = removeCurrencySelection.getSelectedItem().toString();
+            if (name.equals("USD") || name.equals("INR")) {
+                removeWarningLabel.setText("Can't delete USD or INR");
+            } else {
+                Currency c = currencies.get(name);
+                c.removeFromDatabase();
+                c.clearRates();
+                // update currencies field
+                currencies.remove(name);
+                // update input currency drop box
+                String[] list = currencies.keySet().toArray(new String[currencies.keySet().size()]);
+                inputCurrencyField.setModel(new DefaultComboBoxModel(list));
+                removeCurrencySelection.setModel(new DefaultComboBoxModel(list));
+                clearAll();
+                removeCurrency.dispose();
+            }
+        } else {
+            removeWarningLabel.setText("Please check box");
+        }
+    }
+    
+    private void clearAll() {
+        // set input to 0
+        inputField.setText("0");
+        // set drop boxes to default
+        inputCurrencyField.setSelectedIndex(0);
+        amountField.setSelectedIndex(0);
+        // clear the currency field
+        rateField.setText("0");
+        // clear output
+        outputArea.setText("");
+    }
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Converter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> {
+            new Converter().setVisible(true);
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JDialog addCurrency;
+    private javax.swing.JButton addCurrencyButton;
+    private javax.swing.JLabel addCurrencyError;
+    private javax.swing.JTextArea addCurrencyInstructions;
+    private javax.swing.JComboBox amountField;
+    private javax.swing.JButton bClear;
+    private javax.swing.JButton cancelAddButton;
+    private javax.swing.JButton cancelRemoveButton;
+    private javax.swing.JCheckBox confirmRemove;
+    private javax.swing.JButton convertButton;
+    private javax.swing.JComboBox inputCurrencyField;
+    private javax.swing.JTextField inputField;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JMenuItem menuAdd;
+    private javax.swing.JMenuItem menuClear;
+    private javax.swing.JMenu menuClearAll;
+    private javax.swing.JMenuItem menuRemove;
+    private javax.swing.JTextField newCurrencyName;
+    private javax.swing.JTextArea outputArea;
+    private javax.swing.JComboBox<String> outputCurrencyField;
+    private javax.swing.JTextField rateField;
+    private javax.swing.JDialog removeCurrency;
+    private javax.swing.JButton removeCurrencyButton;
+    private javax.swing.JComboBox removeCurrencySelection;
+    private javax.swing.JLabel removeWarningLabel;
+    // End of variables declaration//GEN-END:variables
+}
